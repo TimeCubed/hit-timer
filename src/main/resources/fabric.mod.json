@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "hit-timer",
+	"version": "${version}",
+	"name": "Hit Timer",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/hit-timer/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.github.timecubed.hittimer.MainServer"
+		],
+		"client": [
+          "com.github.timecubed.hittimer.MainClient"
+		]
+	},
+	"mixins": [
+		"hit-timer.mixins.json",
+		{
+			"config": "hit-timer.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.14.22",
+		"minecraft": "~1.19.4",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
