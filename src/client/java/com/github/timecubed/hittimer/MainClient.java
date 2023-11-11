@@ -30,12 +30,8 @@ public class MainClient implements ClientModInitializer {
 		});
 		
 		HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
-			if (lastAttackedPlayer == null) { // TODO: remove this
-				if (damageTicks >= 10) {
-					damageTicks = 0;
-				} else {
-					damageTicks++;
-				}
+			if (lastAttackedPlayer == null) {
+				return;
 			} else {
 				// This is 10 - hurtTime because the progress bar would actually
 				// go backwards (from full to empty) instead of going forwards
@@ -53,11 +49,7 @@ public class MainClient implements ClientModInitializer {
 			
 			int width;
 			
-			if (lastAttackedPlayer != null) { // TODO: remove this
-				width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName()) + 3, 72);
-			} else {
-				width = mc.textRenderer.getWidth("PLACEHOLDERPLACEHOLDERPLACEHOLDER") + 6;
-			}
+			width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName()) + 3, 72);
 			
 			// Draw a rectangle where all of the UI elements will go
 			// TODO: Make the position configurable
@@ -69,10 +61,9 @@ public class MainClient implements ClientModInitializer {
 			// Draw the progress bar
 			DrawableHelper.fill(matrices, scaledWidth / 2 + 3, scaledHeight / 2 + 19, (int) (scaledWidth / 2 + Math.max(((damageTicks / 10.0) * (width - 3)), 3)), scaledHeight / 2 + 23, blendColors(rgba(255, 0, 0, 255), rgba(0, 255, 0, 255), damageTicks / 10.0));
 			
-			// Draw the player's username if we have attacked a player previously.
-			// This shouldn't be visible at all anyway so for the 500th time in a row:
-			// TODO: remove null check
-			mc.textRenderer.drawWithShadow(matrices, (lastAttackedPlayer != null ? lastAttackedPlayer.getDisplayName().getString() : "PLACEHOLDERPLACEHOLDERPLACEHOLDER"), (float) scaledWidth / 2 + 3, (float) scaledHeight / 2 + 3, rgba(255, 255, 255, 255));
+			// Draw the player's username.
+			
+			mc.textRenderer.drawWithShadow(matrices, lastAttackedPlayer.getDisplayName().getString(), (float) scaledWidth / 2 + 3, (float) scaledHeight / 2 + 3, rgba(255, 255, 255, 255));
 		});
 	}
 	
