@@ -1,5 +1,7 @@
 package com.github.timecubed.hittimer;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.timecubed.tulip.TulipConfigManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -8,9 +10,17 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.PlayerSkinDrawer;
+import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.client.render.entity.PlayerModelPart;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 
 public class MainClient implements ClientModInitializer {
 	private static final MinecraftClient mc = MinecraftClient.getInstance();
@@ -81,17 +91,20 @@ public class MainClient implements ClientModInitializer {
 			
 			// Draw a rectangle where all of the UI elements will go
 			// TODO: Make the position configurable
-			DrawableHelper.fill(matrices, tulipInstance.getInt("x"), tulipInstance.getInt("y"), tulipInstance.getInt("x") + width, tulipInstance.getInt("y") + 25, transparentBlack);
+			lekeretitettkocka(matrices,tulipInstance.getInt("x"), tulipInstance.getInt("y"), tulipInstance.getInt("x") + width, tulipInstance.getInt("y") + 25,3, 10, transparentBlack);
+			//DrawableHelper.fill(matrices, tulipInstance.getInt("x"), tulipInstance.getInt("y"), tulipInstance.getInt("x") + width, tulipInstance.getInt("y") + 25, transparentBlack);
 			
 			// Draw a gray box where the progress bar should go
-			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, tulipInstance.getInt("x") + (width - 3), tulipInstance.getInt("y") + 23, rgba(200, 200, 200, 255));
+			//kockafej(matrices, );
+			lekeretitettkocka(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, tulipInstance.getInt("x") + (width - 3), tulipInstance.getInt("y") + 23, 3, 10,rgba(200, 200, 200, 255));
+			//DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, tulipInstance.getInt("x") + (width - 3), tulipInstance.getInt("y") + 23, rgba(200, 200, 200, 255));
 			
 			// Draw the progress bar
 			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, (int) (tulipInstance.getInt("x") + Math.max(((damageTicks / 10.0) * (width - 3)), 3)), tulipInstance.getInt("y") + 23, blendColors(rgba(255, 0, 0, 255), rgba(0, 255, 0, 255), damageTicks / 10.0));
 			
 			// Draw the player's username.
 			
-			mc.textRenderer.drawWithShadow(matrices, "No Target", (float) tulipInstance.getInt("x") + 3, (float) tulipInstance.getInt("y") + 3, rgba(255, 255, 255, 255));
+			mc.textRenderer.draw(matrices, "No Target", (float) tulipInstance.getInt("x") + 3, (float) tulipInstance.getInt("y") + 3, rgba(255, 255, 255, 255));
 		});
 	}
 	
@@ -110,6 +123,41 @@ public class MainClient implements ClientModInitializer {
 		float blendedL = interpolate(hsl1[2], hsl2[2], progression);
 		
 		return hslToRgb(blendedH, blendedS, blendedL);
+	}
+	public static void lekeretitettkocka(@NotNull MatrixStack matrices, double fromX, double fromY, double toX, double toY, double rad, double samples, int c) {
+		int color = c;
+		Matrix4f matrix = matrices.peek().getPositionMatrix();
+		float f = (float) (color >> 24 & 255) / 255.0F;
+		float g = (float) (color >> 16 & 255) / 255.0F;
+		float h = (float) (color >> 8 & 255) / 255.0F;
+		float k = (float) (color & 255) / 255.0F;
+		RenderSystem.enableBlend();
+		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+		abelsocucc(matrix, g, h, k, f, fromX, fromY, toX, toY, rad, samples);
+
+		RenderSystem.disableBlend();
+		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+	}
+	public static void abelsocucc(Matrix4f matrix, float cr, float cg, float cb, float ca, double fromX, double fromY, double toX, double toY, double rad, double samples) {
+		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+		bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+
+		double toX1 = toX - rad;
+		double toY1 = toY - rad;
+		double fromX1 = fromX + rad;
+		double fromY1 = fromY + rad;
+		double[][] map = new double[][]{new double[]{toX1, toY1}, new double[]{toX1, fromY1}, new double[]{fromX1, fromY1}, new double[]{fromX1, toY1}};
+		for (int i = 0; i < 4; i++) {
+			double[] current = map[i];
+			for (double r = i * 90d; r < (360 / 4d + i * 90d); r += (90 / samples)) {
+				float rad1 = (float) Math.toRadians(r);
+				float sin = (float) (Math.sin(rad1) * rad);
+				float cos = (float) (Math.cos(rad1) * rad);
+				bufferBuilder.vertex(matrix, (float) current[0] + sin, (float) current[1] + cos, 0.0F).color(cr, cg, cb, ca).next();
+			}
+		}
+		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private static float[] rgbToHsl(int color) {
