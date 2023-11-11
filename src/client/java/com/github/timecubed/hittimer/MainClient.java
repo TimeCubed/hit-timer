@@ -1,11 +1,15 @@
 package com.github.timecubed.hittimer;
 
+import io.github.timecubed.tulip.TulipConfigManager;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 
 public class MainClient implements ClientModInitializer {
@@ -13,11 +17,19 @@ public class MainClient implements ClientModInitializer {
 	private PlayerEntity lastAttackedPlayer;
 	private int damageTicks = 0;
 	
+	// Tulip instance for config stuff
+	public static TulipConfigManager tulipInstance = new TulipConfigManager("hit-timer", false);
+	
 	@Override
 	public void onInitializeClient() {
+		// Set up config command
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(ClientCommandManager.literal("hittimer").executes(context -> {
+			mc.send(() -> mc.setScreen(new ConfigScreen(Text.of("config"))));
+			return 1;
+		})));
+		
 		// This is apparently not for the client player but for *all* players
 		// So the `player != mc.player` check is in fact vital
-		
 		AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
 			if (player != mc.player) {
 				return ActionResult.PASS;
@@ -29,18 +41,33 @@ public class MainClient implements ClientModInitializer {
 			return ActionResult.PASS;
 		});
 		
+		// I hate that I have to do this disgusting solution, but it is what it is
+		final boolean[] hasRendered = {false};
+		
 		HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
+			int scaledHeight = mc.getWindow().getScaledHeight();
+			int scaledWidth = mc.getWindow().getScaledWidth();
+			
+			// Dear god I'm unhappy with this solution. It's so awful
+			if (!hasRendered[0]) {
+				// Tulip config setup
+				tulipInstance.saveProperty("x", scaledHeight / 2);
+				tulipInstance.saveProperty("y", scaledWidth / 2);
+				
+				// Try to load config file
+				tulipInstance.load();
+				
+				hasRendered[0] = true;
+			}
+			
 			if (lastAttackedPlayer == null) {
-				return;
+				damageTicks = 10;
 			} else {
 				// This is 10 - hurtTime because the progress bar would actually
 				// go backwards (from full to empty) instead of going forwards
 				// (from empty to full). This solves that issue
 				damageTicks = 10 - lastAttackedPlayer.hurtTime;
 			}
-			
-			int scaledHeight = mc.getWindow().getScaledHeight();
-			int scaledWidth = mc.getWindow().getScaledWidth();
 			
 			// 191 is approximately 75% of 255 (255 * 75 / 100 = 191.25)
 			// This is to get a transparent black color with 75% opacity
@@ -49,21 +76,22 @@ public class MainClient implements ClientModInitializer {
 			
 			int width;
 			
-			width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName()) + 3, 72);
+			//width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName()) + 3, 72);
+			width = 72;
 			
 			// Draw a rectangle where all of the UI elements will go
 			// TODO: Make the position configurable
-			DrawableHelper.fill(matrices, scaledWidth / 2, scaledHeight / 2, scaledWidth / 2 + width, scaledHeight / 2 + 25, transparentBlack);
+			DrawableHelper.fill(matrices, tulipInstance.getInt("x"), tulipInstance.getInt("y"), tulipInstance.getInt("x") + width, tulipInstance.getInt("y") + 25, transparentBlack);
 			
 			// Draw a gray box where the progress bar should go
-			DrawableHelper.fill(matrices, scaledWidth / 2 + 3, scaledHeight / 2 + 19, scaledWidth / 2 + (width - 3), scaledHeight / 2 + 23, rgba(200, 200, 200, 255));
+			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, tulipInstance.getInt("x") + (width - 3), tulipInstance.getInt("y") + 23, rgba(200, 200, 200, 255));
 			
 			// Draw the progress bar
-			DrawableHelper.fill(matrices, scaledWidth / 2 + 3, scaledHeight / 2 + 19, (int) (scaledWidth / 2 + Math.max(((damageTicks / 10.0) * (width - 3)), 3)), scaledHeight / 2 + 23, blendColors(rgba(255, 0, 0, 255), rgba(0, 255, 0, 255), damageTicks / 10.0));
+			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, (int) (tulipInstance.getInt("x") + Math.max(((damageTicks / 10.0) * (width - 3)), 3)), tulipInstance.getInt("y") + 23, blendColors(rgba(255, 0, 0, 255), rgba(0, 255, 0, 255), damageTicks / 10.0));
 			
 			// Draw the player's username.
 			
-			mc.textRenderer.drawWithShadow(matrices, lastAttackedPlayer.getDisplayName().getString(), (float) scaledWidth / 2 + 3, (float) scaledHeight / 2 + 3, rgba(255, 255, 255, 255));
+			mc.textRenderer.drawWithShadow(matrices, "No Target", (float) tulipInstance.getInt("x") + 3, (float) tulipInstance.getInt("y") + 3, rgba(255, 255, 255, 255));
 		});
 	}
 	
