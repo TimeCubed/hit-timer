@@ -15,7 +15,13 @@ public class MainClient implements ClientModInitializer {
 	
 	@Override
 	public void onInitializeClient() {
+		// This is apparently not for the client player but for *all* players
+		// So the `player != mc.player` check is in fact vital
+		
 		AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+			if (player != mc.player) {
+				return ActionResult.PASS;
+			}
 			if (entity.isPlayer()) {
 				lastAttackedPlayer = (PlayerEntity) entity;
 			}
@@ -31,14 +37,20 @@ public class MainClient implements ClientModInitializer {
 					damageTicks++;
 				}
 			} else {
-				damageTicks = lastAttackedPlayer.hurtTime;
+				// This is 10 - hurtTime because the progress bar would actually
+				// go backwards (from full to empty) instead of going forwards
+				// (from empty to full). This solves that issue
+				damageTicks = 10 - lastAttackedPlayer.hurtTime;
 			}
 			
 			int scaledHeight = mc.getWindow().getScaledHeight();
 			int scaledWidth = mc.getWindow().getScaledWidth();
 			
-			int transparentBlack = rgba(25, 25, 25, 191); // 191 is approximately 75% of 255
-														             // This is to get a transparent black color with 75% opacity
+			// 191 is approximately 75% of 255 (255 * 75 / 100 = 191.25)
+			// This is to get a transparent black color with 75% opacity
+			
+			int transparentBlack = rgba(25, 25, 25, 191);
+			
 			int width;
 			
 			if (lastAttackedPlayer != null) { // TODO: remove this
@@ -58,7 +70,9 @@ public class MainClient implements ClientModInitializer {
 			DrawableHelper.fill(matrices, scaledWidth / 2 + 3, scaledHeight / 2 + 19, (int) (scaledWidth / 2 + Math.max(((damageTicks / 10.0) * (width - 3)), 3)), scaledHeight / 2 + 23, blendColors(rgba(255, 0, 0, 255), rgba(0, 255, 0, 255), damageTicks / 10.0));
 			
 			// Draw the player's username if we have attacked a player previously.
-			mc.textRenderer.drawWithShadow(matrices, (lastAttackedPlayer != null ? lastAttackedPlayer.getDisplayName().toString() : "PLACEHOLDERPLACEHOLDERPLACEHOLDER"), (float) scaledWidth / 2 + 3, (float) scaledHeight / 2 + 3, rgba(255, 255, 255, 255));
+			// This shouldn't be visible at all anyway so for the 500th time in a row:
+			// TODO: remove null check
+			mc.textRenderer.drawWithShadow(matrices, (lastAttackedPlayer != null ? lastAttackedPlayer.getDisplayName().getString() : "PLACEHOLDERPLACEHOLDERPLACEHOLDER"), (float) scaledWidth / 2 + 3, (float) scaledHeight / 2 + 3, rgba(255, 255, 255, 255));
 		});
 	}
 	
