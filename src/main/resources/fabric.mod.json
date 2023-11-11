@@ -3,15 +3,14 @@
 	"id": "hit-timer",
 	"version": "${version}",
 	"name": "Hit Timer",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "This mod visualizes the damage ticks left for a player to better time your hits properly",
 	"authors": [
-		"Me!"
+		"TimeSquared"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/TimeCubed/hit-timer"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/hit-timer/icon.png",
 	"environment": "*",
 	"entrypoints": {
