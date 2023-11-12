@@ -49,7 +49,7 @@ public class PositionScreen extends Screen {
 		DrawableHelper.fill(matrices, x + 3, y + 19, x + (width - 3), y + 23, rgba(200, 200, 200, 255));
 		
 		// Draw the progress bar
-		DrawableHelper.fill(matrices, x + 3, y + 19, (int) (x + Math.max(((damageTicks / 10.0) * (width - 3)), 3)), y + 23, blendColors(rgba(255, 0, 0, 255), rgba(0, 255, 0, 255), damageTicks / 10.0));
+		DrawableHelper.fill(matrices, x + 3, y + 19, (int) (x + Math.max(((damageTicks / 10.0) * (width - 3)), 3)), y + 23, blendColors(MainClient.tulipInstance.getInt("color1"), MainClient.tulipInstance.getInt("color2"), damageTicks / 10.0));
 		
 		mc.textRenderer.drawWithShadow(matrices, "No Target", (float) x + 3, (float) y + 3, rgba(255, 255, 255, 255));
 		
