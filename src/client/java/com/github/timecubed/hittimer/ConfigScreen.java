@@ -1,5 +1,6 @@
 package com.github.timecubed.hittimer;
 
+import com.github.timecubed.hittimer.util.ColorUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -73,8 +74,8 @@ public class ConfigScreen extends Screen {
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		this.renderBackgroundTexture(matrices);
 		
-		mc.textRenderer.drawWithShadow(matrices, "Color 1: ", (float) this.width / 2 - 15 - mc.textRenderer.getWidth("Color 1: "), (float) this.height / 2 + 5, 0xffffffff);
-		mc.textRenderer.drawWithShadow(matrices, "Color 2: ", (float) this.width / 2 - 15 - mc.textRenderer.getWidth("Color 2: "), (float) this.height / 2 + 30, 0xffffffff);
+		mc.textRenderer.drawWithShadow(matrices, "Color 1: ", (float) this.width / 2 - 15 - mc.textRenderer.getWidth("Color 1: "), (float) this.height / 2 + 5, ColorUtil.Colors.WHITE.color);
+		mc.textRenderer.drawWithShadow(matrices, "Color 2: ", (float) this.width / 2 - 15 - mc.textRenderer.getWidth("Color 2: "), (float) this.height / 2 + 30, ColorUtil.Colors.WHITE.color);
 		
 		super.render(matrices, mouseX, mouseY, delta);
 	}

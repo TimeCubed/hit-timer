@@ -1,5 +1,6 @@
 package com.github.timecubed.hittimer;
 
+import com.github.timecubed.hittimer.util.ColorUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
@@ -50,20 +51,18 @@ public class PositionScreen extends Screen {
 			ticks = 0;
 		}
 		
-		int transparentBlack = rgba(25, 25, 25, 191);
-		
-		DrawableHelper.fill(matrices, x, y, x + width, y + 25, transparentBlack);
+		DrawableHelper.fill(matrices, x, y, x + width, y + 25, ColorUtil.Colors.TRANSPARENT_BLACK.color);
 		
 		// Draw a gray box where the progress bar should go
-		DrawableHelper.fill(matrices, x + 3, y + 19, x + (width - 3), y + 23, rgba(200, 200, 200, 255));
+		DrawableHelper.fill(matrices, x + 3, y + 19, x + (width - 3), y + 23, ColorUtil.Colors.GRAY.color);
 		
 		// Draw the progress bar
-		DrawableHelper.fill(matrices, x + 3, y + 19, (int) (x + Math.max(((damageTicks / 10.0) * (width - 3)), 3)), y + 23, blendColors(MainClient.tulipInstance.getInt("color1"), MainClient.tulipInstance.getInt("color2"), damageTicks / 10.0));
+		DrawableHelper.fill(matrices, x + 3, y + 19, (int) (x + Math.max(((damageTicks / 10.0) * (width - 3)), 3)), y + 23, ColorUtil.blendColors(MainClient.tulipInstance.getInt("color1"), MainClient.tulipInstance.getInt("color2"), damageTicks / 10.0));
 		
-		mc.textRenderer.drawWithShadow(matrices, "No Target", (float) x + 3, (float) y + 3, rgba(255, 255, 255, 255));
+		mc.textRenderer.drawWithShadow(matrices, "No Target", (float) x + 3, (float) y + 3, ColorUtil.Colors.WHITE.color);
 		
-		drawHorizontalLine(matrices, 0, this.width, mouseY, rgba(255, 255, 255, 255));
-		drawVerticalLine(matrices, mouseX, 0, this.height, rgba(255, 255, 255, 255));
+		drawHorizontalLine(matrices, 0, this.width, mouseY, ColorUtil.Colors.WHITE.color);
+		drawVerticalLine(matrices, mouseX, 0, this.height, ColorUtil.Colors.WHITE.color);
 		super.render(matrices, mouseX, mouseY, delta);
 	}
 	
