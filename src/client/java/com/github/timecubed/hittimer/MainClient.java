@@ -1,7 +1,5 @@
 package com.github.timecubed.hittimer;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.timecubed.tulip.TulipConfigManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -10,18 +8,10 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.PlayerSkinDrawer;
 import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.PlayerModelPart;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix4f;
 
 public class MainClient implements ClientModInitializer {
 	private static final MinecraftClient mc = MinecraftClient.getInstance();
@@ -132,7 +122,7 @@ public class MainClient implements ClientModInitializer {
 		return (a << 24) | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
 	}
 	
-	// thanks chatgpt, never could've done this without ya
+	// thanks, ChatGPT, never could've done this without ya
 	
 	private static int blendColors(int color1, int color2, double progression) {
 		float[] hsl1 = rgbToHsl(color1);
