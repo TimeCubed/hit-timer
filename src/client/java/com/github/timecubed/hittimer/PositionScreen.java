@@ -10,7 +10,8 @@ import net.minecraft.text.Text;
 public class PositionScreen extends Screen {
 	private int x = MainClient.tulipInstance.getInt("x"),
 			y = MainClient.tulipInstance.getInt("y"),
-			damageTicks = 0;
+			damageTicks = 0,
+			ticks = 0;
 	
 	private final MinecraftClient mc = MinecraftClient.getInstance();
 	
@@ -35,10 +36,18 @@ public class PositionScreen extends Screen {
 		
 		int width = 72;
 		
-		if (damageTicks == 10) {
-			damageTicks = 0;
-		} else {
+		// Slowing down the progress bar a bit to make it a little more
+		// visible in the config screen
+		
+		ticks++;
+		
+		if (ticks >= 5) {
 			damageTicks++;
+			if (damageTicks > 10) {
+				damageTicks = 0;
+			}
+			
+			ticks = 0;
 		}
 		
 		int transparentBlack = rgba(25, 25, 25, 191);
