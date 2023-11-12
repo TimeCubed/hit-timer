@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.PlayerSkinDrawer;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
@@ -70,8 +71,20 @@ public class MainClient implements ClientModInitializer {
 				hasRendered[0] = true;
 			}
 			
+			// This is so Intellij stops complaining and giving me warnings
+			if (mc.player == null) {
+				return;
+			}
+			
+			// Check if the player is dead, if so, reset the last attacked player
+			if (mc.player.isDead()) {
+				lastAttackedPlayer = null;
+			}
+			
+			// Neat trick with the last check, if the player dies this check will
+			// go off, and we won't actually render anything. Super cool
 			if (lastAttackedPlayer == null) {
-				damageTicks = 10;
+				return;
 			} else {
 				// This is 10 - hurtTime because the progress bar would actually
 				// go backwards (from full to empty) instead of going forwards
@@ -79,32 +92,39 @@ public class MainClient implements ClientModInitializer {
 				damageTicks = 10 - lastAttackedPlayer.hurtTime;
 			}
 			
+			// This check has to be after we check if the lastAttackedPlayer was null
+			// because it *may* be null if we check earlier (e.g. if the player dies
+			// and the earlier check unsets the variable and *then* we check if the
+			// last attacked player was dead, which would result in a crash)
+			if (lastAttackedPlayer.isDead()) {
+				lastAttackedPlayer = null;
+				return; // Return so we don't render stuff and access null values and such
+			}
+			
+			// Check if the chat screen is up, if it is we won't render anything
+			// This is to prevent some poor visibility problems while reading the chat.
+			if (mc.currentScreen instanceof ChatScreen) {
+				return;
+			}
+			
 			// 191 is approximately 75% of 255 (255 * 75 / 100 = 191.25)
 			// This is to get a transparent black color with 75% opacity
-			
 			int transparentBlack = rgba(25, 25, 25, 191);
 			
 			int width;
+			width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName()) + 3, 72);
 			
-			//width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName()) + 3, 72);
-			width = 72;
-			
-			// Draw a rectangle where all of the UI elements will go
-			// TODO: Make the position configurable
-			lekeretitettkocka(matrices,tulipInstance.getInt("x"), tulipInstance.getInt("y"), tulipInstance.getInt("x") + width, tulipInstance.getInt("y") + 25,3, 10, transparentBlack);
-			//DrawableHelper.fill(matrices, tulipInstance.getInt("x"), tulipInstance.getInt("y"), tulipInstance.getInt("x") + width, tulipInstance.getInt("y") + 25, transparentBlack);
+			// Draw a rectangle where all the UI elements will go
+			DrawableHelper.fill(matrices, tulipInstance.getInt("x"), tulipInstance.getInt("y"), tulipInstance.getInt("x") + width, tulipInstance.getInt("y") + 25, transparentBlack);
 			
 			// Draw a gray box where the progress bar should go
-			//kockafej(matrices, );
-			lekeretitettkocka(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, tulipInstance.getInt("x") + (width - 3), tulipInstance.getInt("y") + 23, 3, 10,rgba(200, 200, 200, 255));
-			//DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, tulipInstance.getInt("x") + (width - 3), tulipInstance.getInt("y") + 23, rgba(200, 200, 200, 255));
+			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, tulipInstance.getInt("x") + (width - 3), tulipInstance.getInt("y") + 23, rgba(200, 200, 200, 255));
 			
 			// Draw the progress bar
 			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, (int) (tulipInstance.getInt("x") + Math.max(((damageTicks / 10.0) * (width - 3)), 3)), tulipInstance.getInt("y") + 23, blendColors(rgba(255, 0, 0, 255), rgba(0, 255, 0, 255), damageTicks / 10.0));
 			
 			// Draw the player's username.
-			
-			mc.textRenderer.draw(matrices, "No Target", (float) tulipInstance.getInt("x") + 3, (float) tulipInstance.getInt("y") + 3, rgba(255, 255, 255, 255));
+			mc.textRenderer.draw(matrices, lastAttackedPlayer.getDisplayName().getString(), (float) tulipInstance.getInt("x") + 3, (float) tulipInstance.getInt("y") + 3, rgba(255, 255, 255, 255));
 		});
 	}
 	
@@ -123,41 +143,6 @@ public class MainClient implements ClientModInitializer {
 		float blendedL = interpolate(hsl1[2], hsl2[2], progression);
 		
 		return hslToRgb(blendedH, blendedS, blendedL);
-	}
-	public static void lekeretitettkocka(@NotNull MatrixStack matrices, double fromX, double fromY, double toX, double toY, double rad, double samples, int c) {
-		int color = c;
-		Matrix4f matrix = matrices.peek().getPositionMatrix();
-		float f = (float) (color >> 24 & 255) / 255.0F;
-		float g = (float) (color >> 16 & 255) / 255.0F;
-		float h = (float) (color >> 8 & 255) / 255.0F;
-		float k = (float) (color & 255) / 255.0F;
-		RenderSystem.enableBlend();
-		RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-
-		abelsocucc(matrix, g, h, k, f, fromX, fromY, toX, toY, rad, samples);
-
-		RenderSystem.disableBlend();
-		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-	}
-	public static void abelsocucc(Matrix4f matrix, float cr, float cg, float cb, float ca, double fromX, double fromY, double toX, double toY, double rad, double samples) {
-		BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-		bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
-
-		double toX1 = toX - rad;
-		double toY1 = toY - rad;
-		double fromX1 = fromX + rad;
-		double fromY1 = fromY + rad;
-		double[][] map = new double[][]{new double[]{toX1, toY1}, new double[]{toX1, fromY1}, new double[]{fromX1, fromY1}, new double[]{fromX1, toY1}};
-		for (int i = 0; i < 4; i++) {
-			double[] current = map[i];
-			for (double r = i * 90d; r < (360 / 4d + i * 90d); r += (90 / samples)) {
-				float rad1 = (float) Math.toRadians(r);
-				float sin = (float) (Math.sin(rad1) * rad);
-				float cos = (float) (Math.cos(rad1) * rad);
-				bufferBuilder.vertex(matrix, (float) current[0] + sin, (float) current[1] + cos, 0.0F).color(cr, cg, cb, ca).next();
-			}
-		}
-		BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 	}
 	
 	private static float[] rgbToHsl(int color) {
