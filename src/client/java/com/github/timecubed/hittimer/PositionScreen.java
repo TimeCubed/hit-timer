@@ -3,6 +3,7 @@ package com.github.timecubed.hittimer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
@@ -18,7 +19,15 @@ public class PositionScreen extends Screen {
 	}
 	
 	@Override
-	public void init() {}
+	public void init() {
+		ButtonWidget done = ButtonWidget.builder(Text.of("Done"), button -> {
+			mc.setScreen(new ConfigScreen(Text.of("config")));
+			
+			MainClient.tulipInstance.save();
+		}).dimensions(this.width / 2 - 75, (int) (this.height / 1.1), 150, 20).build();
+		
+		this.addDrawableChild(done);
+	}
 	
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -57,8 +66,6 @@ public class PositionScreen extends Screen {
 			
 			x = (int) mouseX;
 			y = (int) mouseY;
-			
-			MainClient.tulipInstance.save();
 		}
 		
 		return super.mouseClicked(mouseX, mouseY, button);
