@@ -8,7 +8,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 
 import java.awt.*;
-import java.text.ParseException;
 
 public class ConfigScreen extends Screen {
 	private static final MinecraftClient mc = MinecraftClient.getInstance();
