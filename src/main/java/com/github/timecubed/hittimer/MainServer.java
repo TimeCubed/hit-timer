@@ -13,6 +13,6 @@ public class MainServer implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("Initialized Hit Timer successfully!");
+		// empty
 	}
 }
