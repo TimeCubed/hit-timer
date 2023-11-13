@@ -62,6 +62,8 @@ public class MainClient implements ClientModInitializer {
 				// Tulip config setup
 				tulipInstance.saveProperty("x", scaledHeight / 2);
 				tulipInstance.saveProperty("y", scaledWidth / 2);
+				tulipInstance.saveProperty("color1", ColorUtil.Colors.RED.color);
+				tulipInstance.saveProperty("color2", ColorUtil.Colors.GREEN.color);
 				
 				// Try to load config file
 				tulipInstance.load();
