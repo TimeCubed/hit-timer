@@ -112,6 +112,15 @@ public class MainClient implements ClientModInitializer {
 			
 			// Draw the player's username.
 			mc.textRenderer.draw(matrices, lastAttackedPlayer.getDisplayName().getString(), (float) tulipInstance.getInt("x") + 3, (float) tulipInstance.getInt("y") + 3, ColorUtil.Colors.WHITE.color);
+			
+			matrices.push();
+			
+			// Scale the matrix stack to get smaller text
+			matrices.scale(0.5f, 0.5f, 1.0f); // half scale text
+			
+			DrawableHelper.drawTextWithShadow(matrices, mc.textRenderer, "Damage ticks: " + (10 - damageTicks), (tulipInstance.getInt("x") + 3) * 2, (tulipInstance.getInt("y") + mc.textRenderer.getWrappedLinesHeight(lastAttackedPlayer.getDisplayName().getString(), mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().getString())) + 4) * 2, ColorUtil.Colors.WHITE.color);
+		
+			matrices.pop();
 		});
 		
 		MainServer.LOGGER.info("Initialized hit timer successfully!");
