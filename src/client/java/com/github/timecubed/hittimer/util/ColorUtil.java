@@ -3,6 +3,8 @@ package com.github.timecubed.hittimer.util;
 public class ColorUtil {
 	public enum Colors {
 		TRANSPARENT_BLACK(rgba(25, 25, 25, 191)),
+		RED(rgba(255, 0, 0, 255)),
+		GREEN(rgba(0, 255, 0, 255)),
 		GRAY(rgba(200, 200, 200, 255)),
 		WHITE(rgba(255, 255, 255, 255));
 		
