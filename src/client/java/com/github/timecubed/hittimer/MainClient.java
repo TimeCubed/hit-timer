@@ -1,6 +1,8 @@
 package com.github.timecubed.hittimer;
 
 import com.github.timecubed.hittimer.util.ColorUtil;
+import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.timecubed.tulip.TulipConfigManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -9,7 +11,12 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.PlayerSkinDrawer;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.client.render.entity.PlayerModelPart;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -99,30 +106,57 @@ public class MainClient implements ClientModInitializer {
 			}
 			
 			int width;
-			width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName()) + 3, 72);
+			width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName()) + 23, 92);
 			
 			// Draw a rectangle where all the UI elements will go
 			DrawableHelper.fill(matrices, tulipInstance.getInt("x"), tulipInstance.getInt("y"), tulipInstance.getInt("x") + width, tulipInstance.getInt("y") + 25, ColorUtil.Colors.TRANSPARENT_BLACK.color);
 			
 			// Draw a gray box where the progress bar should go
-			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, tulipInstance.getInt("x") + (width - 3), tulipInstance.getInt("y") + 23, ColorUtil.Colors.GRAY.color);
+			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 26, tulipInstance.getInt("y") + 19, tulipInstance.getInt("x") + (width - 3), tulipInstance.getInt("y") + 23, ColorUtil.Colors.GRAY.color);
 			
 			// Draw the progress bar
-			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 19, (int) (tulipInstance.getInt("x") + Math.max(((damageTicks / 10.0) * (width - 3)), 3)), tulipInstance.getInt("y") + 23, ColorUtil.blendColors(tulipInstance.getInt("color1"), tulipInstance.getInt("color2"), damageTicks / 10.0));
+			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 26, tulipInstance.getInt("y") + 19, (int) (tulipInstance.getInt("x") + Math.max(((damageTicks / 10.0) * (width - 3)), 26)), tulipInstance.getInt("y") + 23, ColorUtil.blendColors(tulipInstance.getInt("color1"), tulipInstance.getInt("color2"), damageTicks / 10.0));
 			
 			// Draw the player's username.
-			mc.textRenderer.draw(matrices, lastAttackedPlayer.getDisplayName().getString(), (float) tulipInstance.getInt("x") + 3, (float) tulipInstance.getInt("y") + 3, ColorUtil.Colors.WHITE.color);
+			mc.textRenderer.draw(matrices, lastAttackedPlayer.getDisplayName().getString(), (float) tulipInstance.getInt("x") + 26, (float) tulipInstance.getInt("y") + 3, ColorUtil.Colors.WHITE.color);
 			
 			matrices.push();
 			
 			// Scale the matrix stack to get smaller text
 			matrices.scale(0.5f, 0.5f, 1.0f); // half scale text
 			
-			DrawableHelper.drawTextWithShadow(matrices, mc.textRenderer, "Damage ticks: " + (10 - damageTicks), (tulipInstance.getInt("x") + 3) * 2, (tulipInstance.getInt("y") + mc.textRenderer.getWrappedLinesHeight(lastAttackedPlayer.getDisplayName().getString(), mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().getString())) + 4) * 2, ColorUtil.Colors.WHITE.color);
+			DrawableHelper.drawTextWithShadow(matrices, mc.textRenderer, "Damage ticks: " + (10 - damageTicks), (tulipInstance.getInt("x") + 26) * 2, (tulipInstance.getInt("y") + mc.textRenderer.getWrappedLinesHeight(lastAttackedPlayer.getDisplayName().getString(), mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().getString())) + 4) * 2, ColorUtil.Colors.WHITE.color);
 		
 			matrices.pop();
+			
+			drawPlayerHead(matrices, lastAttackedPlayer, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 3, 20);
 		});
 		
 		MainServer.LOGGER.info("Initialized hit timer successfully!");
+	}
+	
+	// credits to BetyarBaszo for giving me this method
+	public static void drawPlayerHead(MatrixStack matrices, PlayerEntity player, float x, float y, int size) {
+		MinecraftClient mc = MinecraftClient.getInstance();
+		
+		// because intellij is stupid and annoying I have to go put this dumb check, so it can shut up
+		// for once
+		// IT'S COMPLAINING ABOUT THE GRAMMAR AS WELL
+		if (mc.player != null && player != null) {
+			GameProfile gameProfile = new GameProfile(player.getUuid(), player.getName().getString());
+			PlayerListEntry playerListEntry = mc.player.networkHandler.getPlayerListEntry(gameProfile.getId());
+			boolean bl22 = LivingEntityRenderer.shouldFlipUpsideDown(player);
+			boolean bl3 = player.isPartVisible(PlayerModelPart.HAT);
+			
+			// again intellij won't shut up but this time it's really, really stupid and won't shut up
+			// about my grammar mistakes, and also it won't shut up about this dumb warning but this would
+			// never throw a null pointer exception because mc.player is not null anyway and the target isn't
+			// null either. I'm not going to bother doing anything about it either
+			// nvm I have to, it's stopping me from pushing. for god's sake, intellij this isn't an issue I
+			// swear to you. it keeps telling me what to do with my grammar man shut up
+			if (playerListEntry != null)
+				RenderSystem.setShaderTexture(0, playerListEntry.getSkinTexture());
+			PlayerSkinDrawer.draw(matrices, (int) x, (int) y, size, bl3, bl22);
+		}
 	}
 }
