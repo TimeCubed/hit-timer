@@ -108,7 +108,7 @@ public class MainClient implements ClientModInitializer {
 			}
 			
 			int width;
-			width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName()) + 23, 92);
+			width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().asOrderedText()) + 29, 92);
 			
 			// Draw a rectangle where all the UI elements will go
 			DrawableHelper.fill(matrices, tulipInstance.getInt("x"), tulipInstance.getInt("y"), tulipInstance.getInt("x") + width, tulipInstance.getInt("y") + 25, ColorUtil.Colors.TRANSPARENT_BLACK.color);
