@@ -18,7 +18,7 @@ public class PositionScreen extends Screen {
 	private int damageTicks = 0;
 	private int ticks = 0;
 	private final int widthUI = 72;
-	private final int heightUI = 25;
+	private final int heightUI = 26;
 	
 	private boolean dragging = false;
 	

@@ -60,13 +60,22 @@ public class MainClient implements ClientModInitializer {
 			// Dear god I'm unhappy with this solution. It's so awful
 			if (!hasRendered[0]) {
 				// Tulip config setup
-				tulipInstance.saveProperty("x", scaledHeight / 2);
-				tulipInstance.saveProperty("y", scaledWidth / 2);
+				tulipInstance.saveProperty("x", 0.5d);
+				tulipInstance.saveProperty("y", 0.5d);
 				tulipInstance.saveProperty("color1", ColorUtil.Colors.RED.color);
 				tulipInstance.saveProperty("color2", ColorUtil.Colors.GREEN.color);
 				
 				// Try to load config file
 				tulipInstance.load();
+				
+				if (tulipInstance.getDouble("x") > 1.0d || tulipInstance.getDouble("x") < 0.0d) {
+					tulipInstance.saveProperty("x", 0.5d);
+					tulipInstance.saveProperty("y", 0.5d);
+					
+					tulipInstance.save();
+					
+					MainServer.LOGGER.error("Double property 'X' or 'Y' was found to be above 1.0/below 0.0! Resetting X and Y back to the default values of 0.5");
+				}
 				
 				hasRendered[0] = true;
 			}
@@ -111,27 +120,27 @@ public class MainClient implements ClientModInitializer {
 			width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().asOrderedText()) + 29, 92);
 			
 			// Draw a rectangle where all the UI elements will go
-			DrawableHelper.fill(matrices, tulipInstance.getInt("x"), tulipInstance.getInt("y"), tulipInstance.getInt("x") + width, tulipInstance.getInt("y") + 25, ColorUtil.Colors.TRANSPARENT_BLACK.color);
+			DrawableHelper.fill(matrices, (int) (tulipInstance.getDouble("x") * scaledWidth), (int) (tulipInstance.getDouble("y") * scaledHeight), (int) (tulipInstance.getDouble("x") * scaledWidth) + width, (int) (tulipInstance.getDouble("y") * scaledHeight) + 26, ColorUtil.Colors.TRANSPARENT_BLACK.color);
 			
 			// Draw a gray box where the progress bar should go
-			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 26, tulipInstance.getInt("y") + 19, tulipInstance.getInt("x") + (width - 3), tulipInstance.getInt("y") + 23, ColorUtil.Colors.GRAY.color);
+			DrawableHelper.fill(matrices, (int) (tulipInstance.getDouble("x") * scaledWidth) + 26, (int) (tulipInstance.getDouble("y") * scaledHeight) + 19, (int) (tulipInstance.getDouble("x") * scaledWidth) + (width - 3), (int) (tulipInstance.getDouble("y") * scaledHeight) + 23, ColorUtil.Colors.GRAY.color);
 			
 			// Draw the progress bar
-			DrawableHelper.fill(matrices, tulipInstance.getInt("x") + 26, tulipInstance.getInt("y") + 19, (int) (tulipInstance.getInt("x") + Math.max(((damageTicks / 10.0) * (width - 3)), 26)), tulipInstance.getInt("y") + 23, ColorUtil.blendColors(tulipInstance.getInt("color1"), tulipInstance.getInt("color2"), damageTicks / 10.0));
+			DrawableHelper.fill(matrices, (int) (tulipInstance.getDouble("x") * scaledWidth) + 26, (int) (tulipInstance.getDouble("y") * scaledHeight) + 19, (int) ((tulipInstance.getDouble("x") * scaledWidth) + Math.max(((damageTicks / 10.0) * (width - 3)), 26)), (int) (tulipInstance.getDouble("y") * scaledHeight) + 23, ColorUtil.blendColors(tulipInstance.getInt("color1"), tulipInstance.getInt("color2"), damageTicks / 10.0));
 			
 			// Draw the player's username.
-			mc.textRenderer.draw(matrices, lastAttackedPlayer.getDisplayName().getString(), (float) tulipInstance.getInt("x") + 26, (float) tulipInstance.getInt("y") + 3, ColorUtil.Colors.WHITE.color);
+			mc.textRenderer.draw(matrices, lastAttackedPlayer.getDisplayName().getString(), (float) (tulipInstance.getDouble("x") * scaledWidth) + 26, (float) (tulipInstance.getDouble("y") * scaledHeight) + 3, ColorUtil.Colors.WHITE.color);
 			
 			matrices.push();
 			
 			// Scale the matrix stack to get smaller text
 			matrices.scale(0.5f, 0.5f, 1.0f); // half scale text
 			
-			DrawableHelper.drawTextWithShadow(matrices, mc.textRenderer, "Damage ticks: " + (10 - damageTicks), (tulipInstance.getInt("x") + 26) * 2, (tulipInstance.getInt("y") + mc.textRenderer.getWrappedLinesHeight(lastAttackedPlayer.getDisplayName().getString(), mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().getString())) + 4) * 2, ColorUtil.Colors.WHITE.color);
+			DrawableHelper.drawTextWithShadow(matrices, mc.textRenderer, "Damage ticks: " + (10 - damageTicks), ((int) (tulipInstance.getDouble("x") * scaledWidth) + 26) * 2, ((int) (tulipInstance.getDouble("y") * scaledHeight) + mc.textRenderer.getWrappedLinesHeight(lastAttackedPlayer.getDisplayName().getString(), mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().getString())) + 4) * 2, ColorUtil.Colors.WHITE.color);
 		
 			matrices.pop();
 			
-			drawPlayerHead(matrices, lastAttackedPlayer, tulipInstance.getInt("x") + 3, tulipInstance.getInt("y") + 3, 20);
+			drawPlayerHead(matrices, lastAttackedPlayer, (int) (tulipInstance.getDouble("x") * scaledWidth) + 3, (int) (tulipInstance.getDouble("y") * scaledHeight) + 3, 20);
 		});
 		
 		MainServer.LOGGER.info("Initialized hit timer successfully!");
