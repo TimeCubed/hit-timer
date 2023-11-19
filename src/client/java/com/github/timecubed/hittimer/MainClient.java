@@ -52,47 +52,30 @@ public class MainClient implements ClientModInitializer {
 		});
 		
 		HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
-			loadConfigs();
+			setupConfigs();
 			
-			if (mc.player == null) {
+			if (!shouldRender()) {
 				return;
 			}
 			
-			if (mc.player.isDead()) {
-				lastAttackedPlayer = null;
-			}
-			
-			if (lastAttackedPlayer == null) {
-				return;
-			} else {
-				damageTicks = 10 - lastAttackedPlayer.hurtTime;
-			}
-			
-			if (lastAttackedPlayer.isDead()) {
-				lastAttackedPlayer = null;
-				return;
-			}
-			
-			if (mc.currentScreen instanceof ChatScreen) {
-				return;
-			}
+			damageTicks = 10 - lastAttackedPlayer.hurtTime;
 			
 			if (tulipInstance.getBoolean("render-hud")) {
-				renderTargetHUD(matrices, tickDelta);
+				renderTargetHUD(matrices);
 				return;
 			}
 			
-			renderCircularHUD(matrices, tickDelta);
-			});
+			renderCircularHUD(matrices);
+		});
 		
 		MainServer.LOGGER.info("Initialized hit timer successfully!");
 	}
 	
-	private void renderCircularHUD(MatrixStack matrices, float tickDelta) {
+	private void renderCircularHUD(MatrixStack matrices) {
 		// TODO: figure out how to do this pls
 	}
 	
-	private void renderTargetHUD(MatrixStack matrices, float tickDelta) {
+	private void renderTargetHUD(MatrixStack matrices) {
 		int width;
 		width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().asOrderedText()) + 29, 92);
 		
@@ -121,19 +104,17 @@ public class MainClient implements ClientModInitializer {
 	}
 	
 	boolean configsLoaded = false;
-	private void loadConfigs() {
+	private void setupConfigs() {
 		if (configsLoaded) {
 			return;
 		}
 		
-		// Tulip config setup
 		tulipInstance.saveProperty("x", 0.5d);
 		tulipInstance.saveProperty("y", 0.5d);
 		tulipInstance.saveProperty("color1", ColorUtil.Colors.RED.color);
 		tulipInstance.saveProperty("color2", ColorUtil.Colors.GREEN.color);
 		tulipInstance.saveProperty("render-hud", true);
 		
-		// Try to load config file
 		tulipInstance.load();
 		
 		if (tulipInstance.getDouble("x") > 1.0d || tulipInstance.getDouble("x") < 0.0d || tulipInstance.getDouble("y") > 1.0d || tulipInstance.getDouble("y") < 0.0d) {
@@ -162,5 +143,26 @@ public class MainClient implements ClientModInitializer {
 				RenderSystem.setShaderTexture(0, playerListEntry.getSkinTexture());
 			PlayerSkinDrawer.draw(matrices, (int) x, (int) y, size, bl3, bl22);
 		}
+	}
+	
+	private boolean shouldRender() {
+		if (mc.player == null) {
+			return false;
+		}
+		
+		if (mc.player.isDead()) {
+			lastAttackedPlayer = null;
+		}
+		
+		if (lastAttackedPlayer == null) {
+			return false;
+		}
+		
+		if (lastAttackedPlayer.isDead()) {
+			lastAttackedPlayer = null;
+			return false;
+		}
+		
+		return !(mc.currentScreen instanceof ChatScreen);
 	}
 }
