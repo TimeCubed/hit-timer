@@ -29,7 +29,6 @@ public class MainClient implements ClientModInitializer {
 	// Tulip instance for config stuff
 	public static TulipConfigManager tulipInstance = new TulipConfigManager("hit-timer", false);
 	
-	
 	private final int scaledHeight = mc.getWindow().getScaledHeight();
 	private final int scaledWidth = mc.getWindow().getScaledWidth();
 	
@@ -80,23 +79,23 @@ public class MainClient implements ClientModInitializer {
 		width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().asOrderedText()) + 29, 92);
 		
 		// Draw a rectangle where all the UI elements will go
-		DrawableHelper.fill(matrices, (int) (tulipInstance.getDouble("x") * scaledWidth), (int) (tulipInstance.getDouble("y") * scaledHeight), (int) (tulipInstance.getDouble("x") * scaledWidth) + width, (int) (tulipInstance.getDouble("y") * scaledHeight) + 26, ColorUtil.Colors.TRANSPARENT_BLACK.color);
+		DrawableHelper.fill(matrices, (int) (tulipInstance.getDouble("x") * scaledWidth), (int) (tulipInstance.getDouble("y") * scaledHeight), (int) (tulipInstance.getDouble("x") * scaledWidth) + width, (int) (tulipInstance.getDouble("y") * scaledHeight) + 26, ColorUtil.TRANSPARENT_BLACK);
 		
 		// Draw a gray box where the progress bar should go
-		DrawableHelper.fill(matrices, (int) (tulipInstance.getDouble("x") * scaledWidth) + 26, (int) (tulipInstance.getDouble("y") * scaledHeight) + 19, (int) (tulipInstance.getDouble("x") * scaledWidth) + (width - 3), (int) (tulipInstance.getDouble("y") * scaledHeight) + 23, ColorUtil.Colors.GRAY.color);
+		DrawableHelper.fill(matrices, (int) (tulipInstance.getDouble("x") * scaledWidth) + 26, (int) (tulipInstance.getDouble("y") * scaledHeight) + 19, (int) (tulipInstance.getDouble("x") * scaledWidth) + (width - 3), (int) (tulipInstance.getDouble("y") * scaledHeight) + 23, ColorUtil.GRAY);
 		
 		// Draw the progress bar
 		DrawableHelper.fill(matrices, (int) (tulipInstance.getDouble("x") * scaledWidth) + 26, (int) (tulipInstance.getDouble("y") * scaledHeight) + 19, (int) ((tulipInstance.getDouble("x") * scaledWidth) + Math.max(((damageTicks / 10.0) * (width - 3)), 26)), (int) (tulipInstance.getDouble("y") * scaledHeight) + 23, ColorUtil.blendColors(tulipInstance.getInt("color1"), tulipInstance.getInt("color2"), damageTicks / 10.0));
 		
 		// Draw the player's username.
-		mc.textRenderer.draw(matrices, lastAttackedPlayer.getDisplayName().getString(), (float) (tulipInstance.getDouble("x") * scaledWidth) + 26, (float) (tulipInstance.getDouble("y") * scaledHeight) + 3, ColorUtil.Colors.WHITE.color);
+		mc.textRenderer.draw(matrices, lastAttackedPlayer.getDisplayName().getString(), (float) (tulipInstance.getDouble("x") * scaledWidth) + 26, (float) (tulipInstance.getDouble("y") * scaledHeight) + 3, ColorUtil.WHITE);
 		
 		matrices.push();
 		
 		// Scale the matrix stack to get smaller text
 		matrices.scale(0.5f, 0.5f, 1.0f);
 		
-		DrawableHelper.drawTextWithShadow(matrices, mc.textRenderer, "Damage ticks: " + (10 - damageTicks), ((int) (tulipInstance.getDouble("x") * scaledWidth) + 26) * 2, ((int) (tulipInstance.getDouble("y") * scaledHeight) + mc.textRenderer.getWrappedLinesHeight(lastAttackedPlayer.getDisplayName().getString(), mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().getString())) + 4) * 2, ColorUtil.Colors.WHITE.color);
+		DrawableHelper.drawTextWithShadow(matrices, mc.textRenderer, "Damage ticks: " + (10 - damageTicks), ((int) (tulipInstance.getDouble("x") * scaledWidth) + 26) * 2, ((int) (tulipInstance.getDouble("y") * scaledHeight) + mc.textRenderer.getWrappedLinesHeight(lastAttackedPlayer.getDisplayName().getString(), mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().getString())) + 4) * 2, ColorUtil.WHITE);
 		
 		matrices.pop();
 		
@@ -111,8 +110,8 @@ public class MainClient implements ClientModInitializer {
 		
 		tulipInstance.saveProperty("x", 0.5d);
 		tulipInstance.saveProperty("y", 0.5d);
-		tulipInstance.saveProperty("color1", ColorUtil.Colors.RED.color);
-		tulipInstance.saveProperty("color2", ColorUtil.Colors.GREEN.color);
+		tulipInstance.saveProperty("color1", ColorUtil.RED);
+		tulipInstance.saveProperty("color2", ColorUtil.GREEN);
 		tulipInstance.saveProperty("render-hud", true);
 		
 		tulipInstance.load();

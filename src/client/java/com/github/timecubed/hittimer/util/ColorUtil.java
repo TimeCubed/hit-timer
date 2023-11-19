@@ -1,19 +1,11 @@
 package com.github.timecubed.hittimer.util;
 
 public class ColorUtil {
-	public enum Colors {
-		TRANSPARENT_BLACK(rgba(25, 25, 25, 191)),
-		RED(rgba(255, 0, 0, 255)),
-		GREEN(rgba(0, 255, 0, 255)),
-		GRAY(rgba(200, 200, 200, 255)),
-		WHITE(rgba(255, 255, 255, 255));
-		
-		public final int color;
-		
-		Colors(int color) {
-			this.color = color;
-		}
-	}
+	public static final int TRANSPARENT_BLACK = rgba(25, 25, 25, 191);
+	public static final int RED = rgba(255, 0, 0, 255);
+	public static final int GREEN = rgba(0, 255, 0, 255);
+	public static final int GRAY = rgba(200, 200, 200, 255);
+	public static final int WHITE = rgba(255, 255, 255, 255);
 	
 	public static int rgba(int r, int g, int b, int a) {
 		return (a << 24) | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
