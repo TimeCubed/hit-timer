@@ -62,18 +62,18 @@ public class PositionScreen extends Screen {
 			ticks = 0;
 		}
 		
-		DrawableHelper.fill(matrices, (int) (scaledX * scaledWidth), (int) (scaledY * scaledHeight), (int) ((scaledX * scaledWidth) + widthUI), (int) ((scaledY * scaledHeight) + heightUI), ColorUtil.Colors.TRANSPARENT_BLACK.color);
+		DrawableHelper.fill(matrices, (int) (scaledX * scaledWidth), (int) (scaledY * scaledHeight), (int) ((scaledX * scaledWidth) + widthUI), (int) ((scaledY * scaledHeight) + heightUI), ColorUtil.TRANSPARENT_BLACK);
 		
 		// Draw a gray box where the progress bar should go
-		DrawableHelper.fill(matrices, (int) (scaledX * scaledWidth) + 3, (int) (scaledY * scaledHeight) + 19, (int) (scaledX * scaledWidth) + (widthUI - 3), (int) (scaledY * scaledHeight) + 23, ColorUtil.Colors.GRAY.color);
+		DrawableHelper.fill(matrices, (int) (scaledX * scaledWidth) + 3, (int) (scaledY * scaledHeight) + 19, (int) (scaledX * scaledWidth) + (widthUI - 3), (int) (scaledY * scaledHeight) + 23, ColorUtil.GRAY);
 		
 		// Draw the progress bar
 		DrawableHelper.fill(matrices, (int) (scaledX * scaledWidth) + 3, (int) (scaledY * scaledHeight) + 19, (int) ((int) (scaledX * scaledWidth) + Math.max(((damageTicks / 10.0) * (widthUI - 3)), 3)), (int) (scaledY * scaledHeight) + 23, ColorUtil.blendColors(MainClient.tulipInstance.getInt("color1"), MainClient.tulipInstance.getInt("color2"), damageTicks / 10.0));
 		
-		mc.textRenderer.drawWithShadow(matrices, "No Target", (float) (int) (scaledX * scaledWidth) + 3, (float) (int) (scaledY * scaledHeight) + 3, ColorUtil.Colors.WHITE.color);
+		mc.textRenderer.drawWithShadow(matrices, "No Target", (float) (int) (scaledX * scaledWidth) + 3, (float) (int) (scaledY * scaledHeight) + 3, ColorUtil.WHITE);
 		
-		drawHorizontalLine(matrices, 0, this.width, (int) (scaledY * scaledHeight), ColorUtil.Colors.WHITE.color);
-		drawVerticalLine(matrices, (int) (scaledX * scaledWidth), 0, this.height, ColorUtil.Colors.WHITE.color);
+		drawHorizontalLine(matrices, 0, this.width, (int) (scaledY * scaledHeight), ColorUtil.WHITE);
+		drawVerticalLine(matrices, (int) (scaledX * scaledWidth), 0, this.height, ColorUtil.WHITE);
 		super.render(matrices, mouseX, mouseY, delta);
 	}
 	
