@@ -98,9 +98,19 @@ public class PositionScreen extends Screen {
 	
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-		if (dragging) {
-			scaledX = (mouseX - diffX) / scaledWidth;
-			scaledY = (mouseY - diffY) / scaledHeight;
+		if (!dragging) {
+			return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+		}
+		
+		scaledX = Math.max((mouseX - diffX) / scaledWidth, 0.0d);
+		scaledY = Math.max((mouseY - diffY) / scaledHeight, 0.0d);
+		
+		if (scaledX * scaledWidth > scaledWidth - widthUI) {
+			scaledX = (double) (scaledWidth - widthUI) / scaledWidth;
+		}
+		
+		if (scaledY * scaledHeight > scaledHeight - heightUI) {
+			scaledY = (double) (scaledHeight - heightUI) / scaledHeight;
 		}
 		
 		super.mouseMoved(mouseX, mouseY);
