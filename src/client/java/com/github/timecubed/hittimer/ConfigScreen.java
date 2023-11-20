@@ -24,21 +24,21 @@ public class ConfigScreen extends Screen {
 		).dimensions(this.width / 2 - 75, this.height / 2 - 25, 150, 20).build();
 		
 		TextFieldWidget color1 = new TextFieldWidget(
-				mc.textRenderer,
-				this.width / 2,
-				this.height / 2,
-				75,
-				20,
-				Text.of("intfield")
+			mc.textRenderer,
+			this.width / 2,
+			this.height / 2,
+			75,
+			20,
+			Text.of("int-field")
 		);
 		
 		TextFieldWidget color2 = new TextFieldWidget(
-				mc.textRenderer,
-				this.width / 2,
-				this.height / 2 + 25,
-				75,
-				20,
-				Text.of("intfield")
+			mc.textRenderer,
+			this.width / 2,
+			this.height / 2 + 25,
+			75,
+			20,
+			Text.of("int-field")
 		);
 		
 		ButtonWidget done = ButtonWidget.builder(Text.of("Done"), button -> {
@@ -52,9 +52,6 @@ public class ConfigScreen extends Screen {
 				c1 = Color.decode(color1.getText());
 				c2 = Color.decode(color2.getText());
 			} catch (NumberFormatException e) {
-				if (mc.player != null) {
-					mc.player.sendMessage(Text.of("That was not a correct hex color code!"));
-				}
 				return;
 			}
 			
@@ -74,8 +71,8 @@ public class ConfigScreen extends Screen {
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		this.renderBackgroundTexture(matrices);
 		
-		mc.textRenderer.drawWithShadow(matrices, "Color 1: ", (float) this.width / 2 - 15 - mc.textRenderer.getWidth("Color 1: "), (float) this.height / 2 + 5, ColorUtil.Colors.WHITE.color);
-		mc.textRenderer.drawWithShadow(matrices, "Color 2: ", (float) this.width / 2 - 15 - mc.textRenderer.getWidth("Color 2: "), (float) this.height / 2 + 30, ColorUtil.Colors.WHITE.color);
+		mc.textRenderer.drawWithShadow(matrices, "Color 1: ", (float) this.width / 2 - 15 - mc.textRenderer.getWidth("Color 1: "), (float) this.height / 2 + 5, ColorUtil.WHITE);
+		mc.textRenderer.drawWithShadow(matrices, "Color 2: ", (float) this.width / 2 - 15 - mc.textRenderer.getWidth("Color 2: "), (float) this.height / 2 + 30, ColorUtil.WHITE);
 		
 		super.render(matrices, mouseX, mouseY, delta);
 	}
