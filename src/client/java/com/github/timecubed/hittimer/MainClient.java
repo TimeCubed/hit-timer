@@ -21,6 +21,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 
+import java.nio.file.Path;
+
 public class MainClient implements ClientModInitializer {
 	private static final MinecraftClient mc = MinecraftClient.getInstance();
 	private PlayerEntity lastAttackedPlayer;
@@ -28,9 +30,6 @@ public class MainClient implements ClientModInitializer {
 	
 	// Tulip instance for config stuff
 	public static TulipConfigManager tulipInstance = new TulipConfigManager("hit-timer", false);
-	
-	private final int scaledHeight = mc.getWindow().getScaledHeight();
-	private final int scaledWidth = mc.getWindow().getScaledWidth();
 	
 	@Override
 	public void onInitializeClient() {
@@ -51,6 +50,9 @@ public class MainClient implements ClientModInitializer {
 		});
 		
 		HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
+			final int scaledHeight = mc.getWindow().getScaledHeight();
+			final int scaledWidth = mc.getWindow().getScaledWidth();
+			
 			setupConfigs();
 			
 			if (!shouldRender()) {
@@ -59,24 +61,14 @@ public class MainClient implements ClientModInitializer {
 			
 			damageTicks = 10 - lastAttackedPlayer.hurtTime;
 			
-			if (tulipInstance.getBoolean("render-hud")) {
-				renderTargetHUD(matrices);
-				return;
-			}
-			
-			renderCircularHUD(matrices);
+			renderTargetHUD(matrices, scaledWidth, scaledHeight);
 		});
 		
 		MainServer.LOGGER.info("Initialized hit timer successfully!");
 	}
 	
-	private void renderCircularHUD(MatrixStack matrices) {
-		// TODO: figure out how to do this pls
-	}
-	
-	private void renderTargetHUD(MatrixStack matrices) {
-		int width;
-		width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().asOrderedText()) + 29, 92);
+	private void renderTargetHUD(MatrixStack matrices, int scaledWidth, int scaledHeight) {
+		int width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().asOrderedText()) + 29, 92);
 		
 		// Draw a rectangle where all the UI elements will go
 		DrawableHelper.fill(matrices, (int) (tulipInstance.getDouble("x") * scaledWidth), (int) (tulipInstance.getDouble("y") * scaledHeight), (int) (tulipInstance.getDouble("x") * scaledWidth) + width, (int) (tulipInstance.getDouble("y") * scaledHeight) + 26, ColorUtil.TRANSPARENT_BLACK);
@@ -112,7 +104,6 @@ public class MainClient implements ClientModInitializer {
 		tulipInstance.saveProperty("y", 0.5d);
 		tulipInstance.saveProperty("color1", ColorUtil.RED);
 		tulipInstance.saveProperty("color2", ColorUtil.GREEN);
-		tulipInstance.saveProperty("render-hud", true);
 		
 		tulipInstance.load();
 		
