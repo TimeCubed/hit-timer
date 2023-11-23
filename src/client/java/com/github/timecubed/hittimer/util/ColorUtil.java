@@ -11,6 +11,14 @@ public class ColorUtil {
 		return (a << 24) | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
 	}
 	
+	public static int[] rgbaToRGB(int rgba) {
+		int r = (rgba >> 16) & 0xFF;
+		int g = (rgba >> 8) & 0xFF;
+		int b = rgba & 0xFF;
+		
+		return new int[] {r, g, b};
+	}
+	
 	public static int blendColors(int color1, int color2, double progression) {
 		float[] hsl1 = rgbToHsl(color1);
 		float[] hsl2 = rgbToHsl(color2);
