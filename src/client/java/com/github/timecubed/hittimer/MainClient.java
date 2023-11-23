@@ -21,8 +21,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 
-import java.nio.file.Path;
-
 public class MainClient implements ClientModInitializer {
 	private static final MinecraftClient mc = MinecraftClient.getInstance();
 	private PlayerEntity lastAttackedPlayer;
@@ -67,7 +65,7 @@ public class MainClient implements ClientModInitializer {
 		MainServer.LOGGER.info("Initialized hit timer successfully!");
 	}
 	
-	private void renderTargetHUD(MatrixStack matrices, int scaledWidth, int scaledHeight) {
+	private void renderTargetHUD(MatrixStack matrices, final int scaledWidth, final int scaledHeight) {
 		int width = Math.max(mc.textRenderer.getWidth(lastAttackedPlayer.getDisplayName().asOrderedText()) + 29, 92);
 		
 		// Draw a rectangle where all the UI elements will go
@@ -104,6 +102,7 @@ public class MainClient implements ClientModInitializer {
 		tulipInstance.saveProperty("y", 0.5d);
 		tulipInstance.saveProperty("color1", ColorUtil.RED);
 		tulipInstance.saveProperty("color2", ColorUtil.GREEN);
+		tulipInstance.saveProperty("render-circle-hud", false);
 		
 		tulipInstance.load();
 		
